@@ -1,0 +1,48 @@
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <title>hello</title>
+    <link rel="shortcut icon" th:href="@{/favicon.ico}"/>
+    <link rel="bookmark" th:href="@{/favicon.ico}"/>
+</head>
+<body>
+<p>Welcome to <span th:text="${page.size}">Our App</span></p>
+<table align='center' border='1' cellspacing='0'>
+    <thead>
+    <tr>
+        <td>id</td>
+        <td>name</td>
+        <td>sex</td>
+        <td>Edit</td>
+        <td>Delete</td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${page.list}">
+        <td th:text="${user.id}">id</td>
+        <td th:text="${user.name}">name</td>
+        <td th:text="${user.sex}">sex</td>
+        <td><a th:href="@{'/editeUser/'+${user.id}}">Edit</a></td>
+        <td><a th:href="@{'/deleteUser/'+${user.id}}">Delete</a></td>
+    </tr>
+    </tbody>
+</table>
+<div align="center">
+    <form action="addUser" method="post">
+        name: <input name="name"> <br>
+        sex: <input name="sex"> <br>
+        <!--<input name="lastPage" type="hidden" th:value="${page.navigateLastPage}">-->
+        <button type="submit">提交</button>
+    </form>
+    <div>
+        <a th:href="'?start='+${page.navigateFirstPage}">[首 页]</a>
+        <a th:href="@{'?start='+${page.prePage}}">[上一页]</a>
+        <a th:href="@{'?start='+${page.nextPage}}">[下一页]</a>
+        <a th:href="@{'?start='+${page.navigateLastPage}}">[末 页]</a>
+    </div>
+</div>
+
+
+</body>
+</html>
