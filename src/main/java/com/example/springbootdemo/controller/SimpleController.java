@@ -1,9 +1,7 @@
 package com.example.springbootdemo.controller;
 
-import com.alibaba.fastjson.JSONObject;
-import com.example.springbootdemo.dao.UserDao;
 import com.example.springbootdemo.pojo.User;
-import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.example.springbootdemo.service.UserService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,15 +16,15 @@ import java.util.List;
 public class SimpleController {
 
     @Autowired
-    UserDao userDao;
+    UserService userService;
 
     @RequestMapping("/")
     @ResponseBody
-    public PageInfo hello(HttpSession session, Model model, @RequestParam(value = "start", defaultValue = "0") int start, @RequestParam(value = "size", defaultValue = "10") int size) throws Exception {
+    public PageInfo hello(HttpSession session, Model model, @RequestParam(value = "start", defaultValue = "0") int start, @RequestParam(value = "size", defaultValue = "10") int size) {
         model.addAttribute("appName", "hello123");
 
         PageHelper.startPage(start, size);
-        List<User> userList = userDao.listAll();
+        List<User> userList = userService.listAll();
         PageInfo<User> page = new PageInfo<>(userList);
 
 //        System.out.println(start + ", " + size);
@@ -44,32 +42,29 @@ public class SimpleController {
     }
 
     @RequestMapping("/addUser")
-    public String addUser(User user, HttpSession session) throws Exception {
-        userDao.addUser(user);
-        List<User> list = userDao.listAll();
-        PageInfo<User> page = new PageInfo<>(list);
-
+    public String addUser(User user, HttpSession session) {
+        userService.addUser(user);
         int lastPage = (Integer) session.getAttribute("lastPage");
         System.out.println(lastPage);
         return "redirect:/?start=" + Integer.toString(lastPage);
     }
 
     @RequestMapping("/deleteUser/{id}")
-    public String deleteUser(@PathVariable(value = "id") int id) throws Exception {
-        userDao.deleteUser(id);
+    public String deleteUser(@PathVariable(value = "id") int id) {
+        userService.deleteUser(id);
         return "redirect:/";
     }
 
     @RequestMapping("/editeUser/{id}")
-    public String editUser(@PathVariable(value = "id") int id, Model model) throws Exception {
-        User user = userDao.getUser(id);
+    public String editUser(@PathVariable(value = "id") int id, Model model) {
+        User user = userService.getUser(id);
         model.addAttribute("user", user);
         return "editUser";
     }
 
     @RequestMapping("/updateUser")
-    public String updateUser(User user) throws Exception {
-        userDao.updateUser(user);
+    public String updateUser(User user) {
+        userService.updateUser(user);
         return "redirect:/";
     }
 }
