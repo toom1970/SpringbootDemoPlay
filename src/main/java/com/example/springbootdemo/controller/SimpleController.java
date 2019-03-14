@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.logging.Logger;
 
 @Controller
 public class SimpleController {
@@ -38,6 +40,9 @@ public class SimpleController {
 //        jsonObject.put("page", page);
 //        System.out.println(jsonObject.toString());
 //        return jsonObject.toJSONString();
+        Jedis jedis = new Jedis("localhost");
+        Logger logger = Logger.getLogger("Jedis");
+        logger.info(jedis.ping());
         return page;
     }
 
@@ -55,11 +60,13 @@ public class SimpleController {
         return "redirect:/";
     }
 
-    @RequestMapping("/editeUser/{id}")
-    public String editUser(@PathVariable(value = "id") int id, Model model) {
+    @RequestMapping("/editUser/{id}")
+    @ResponseBody
+    public User editUser(@PathVariable(value = "id") int id, Model model) {
         User user = userService.getUser(id);
         model.addAttribute("user", user);
-        return "editUser";
+//        return "editUser";
+        return user;
     }
 
     @RequestMapping("/updateUser")

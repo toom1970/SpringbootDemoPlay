@@ -2,6 +2,7 @@ package com.example.springbootdemo.dao;
 
 import com.example.springbootdemo.pojo.User;
 import org.apache.ibatis.annotations.*;
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,6 @@ public interface UserDao {
     @Update("update ggg set name=#{name}, sex=#{sex} where id = #{id}")
     public int updateUser(User user);
 
-    @Cacheable
     @Select("select * from ggg where id = #{id}")
     public User getUser(int id);
 }
