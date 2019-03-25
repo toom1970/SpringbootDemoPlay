@@ -1,9 +1,13 @@
 package com.example.springbootdemo.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.springbootdemo.pojo.User;
 import com.example.springbootdemo.service.UserService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.*;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,7 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 @Controller
@@ -22,15 +28,13 @@ public class SimpleController {
 
     @RequestMapping("/")
     @ResponseBody
-    public PageInfo hello(HttpSession session, Model model, @RequestParam(value = "start", defaultValue = "0") int start, @RequestParam(value = "size", defaultValue = "10") int size) {
+    public PageInfo hello(HttpSession session, Model model, @RequestParam(value = "start", defaultValue = "0") int start, @RequestParam(value = "size", defaultValue = "10") int size) throws
+            Exception {
         model.addAttribute("appName", "hello123");
 
         PageHelper.startPage(start, size);
         List<User> userList = userService.listAll();
         PageInfo<User> page = new PageInfo<>(userList);
-
-//        System.out.println(start + ", " + size);
-//        System.out.println(page.getPageNum() + ", " + page.getNavigateFirstPage());
         if (page.getPageNum() <= 0)
             page.setNextPage(2);
         model.addAttribute("page", page);
@@ -43,6 +47,8 @@ public class SimpleController {
         Jedis jedis = new Jedis("localhost");
         Logger logger = Logger.getLogger("Jedis");
         logger.info(jedis.ping());
+//        if (true)
+//            throw new Exception("asd");
         return page;
     }
 
@@ -73,5 +79,40 @@ public class SimpleController {
     public String updateUser(User user) {
         userService.updateUser(user);
         return "redirect:/";
+    }
+
+    @RequestMapping("/success")
+    public String certifiedSuccess() {
+        return "redirect:/";
+    }
+
+    @ResponseBody
+    @RequestMapping("/login")
+    public String login(@RequestParam("name") String name, @RequestParam("password") String password) {
+        Map<String, Object> map = new HashMap<>();
+
+        Subject subject = SecurityUtils.getSubject();
+        JSONObject json = new JSONObject();
+        if (subject.isAuthenticated() == false) {
+            UsernamePasswordToken token = new UsernamePasswordToken(name, password);
+            try {
+                subject.login(token);
+                json.put("message", "SUCCESS!");
+                subject.logout();
+            } catch (UnknownAccountException e) {
+                json.put("message", e.getMessage());
+                return json.toJSONString();
+            } catch (IncorrectCredentialsException e) {
+                json.put("message", e.getMessage());
+                return json.toJSONString();
+            } catch (LockedAccountException e) {
+                json.put("message", e.getMessage());
+                return json.toJSONString();
+            } catch (AuthenticationException e) {
+                json.put("message", e.getMessage());
+                return json.toJSONString();
+            }
+        }
+        return json.toJSONString();
     }
 }

@@ -20,7 +20,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         model.addAttribute("error", e);
         model.addAttribute("url", request.getRequestURL());
         model.addAttribute("status",HttpStatus.BAD_REQUEST);
-        return "error/error";
+        return "error/403";
     }
 //    protected ResponseEntity<Object> errorHandle(Exception e, WebRequest request) {
 //        return handleExceptionInternal(e, e.getLocalizedMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
