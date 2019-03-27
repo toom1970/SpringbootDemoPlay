@@ -7,13 +7,14 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.subject.Subject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import redis.clients.jedis.Jedis;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
@@ -23,13 +24,12 @@ import java.util.logging.Logger;
 @Controller
 public class SimpleController {
 
-    @Autowired
+    @Resource(name = "userService")
     UserService userService;
 
     @RequestMapping("/")
     @ResponseBody
-    public PageInfo hello(HttpSession session, Model model, @RequestParam(value = "start", defaultValue = "0") int start, @RequestParam(value = "size", defaultValue = "10") int size) throws
-            Exception {
+    public PageInfo hello(HttpSession session, Model model, @RequestParam(value = "start", defaultValue = "0") int start, @RequestParam(value = "size", defaultValue = "10") int size) throws Exception {
         model.addAttribute("appName", "hello123");
 
         PageHelper.startPage(start, size);
@@ -72,6 +72,7 @@ public class SimpleController {
         User user = userService.getUser(id);
         model.addAttribute("user", user);
 //        return "editUser";
+
         return user;
     }
 
@@ -89,8 +90,6 @@ public class SimpleController {
     @ResponseBody
     @RequestMapping("/login")
     public String login(@RequestParam("name") String name, @RequestParam("password") String password) {
-        Map<String, Object> map = new HashMap<>();
-
         Subject subject = SecurityUtils.getSubject();
         JSONObject json = new JSONObject();
         if (subject.isAuthenticated() == false) {
@@ -98,7 +97,7 @@ public class SimpleController {
             try {
                 subject.login(token);
                 json.put("message", "SUCCESS!");
-                subject.logout();
+//                subject.logout();
             } catch (UnknownAccountException e) {
                 json.put("message", e.getMessage());
                 return json.toJSONString();
@@ -114,5 +113,26 @@ public class SimpleController {
             }
         }
         return json.toJSONString();
+    }
+
+    @RequiresAuthentication
+    @RequestMapping("/logout")
+    public String logout() {
+        Subject subject = SecurityUtils.getSubject();
+        subject.logout();
+        return "redirect:/";
+    }
+
+    @RequestMapping("/403")
+    public String unau() {
+        return "error/403";
+    }
+
+    @ResponseBody
+    @RequestMapping("/add")
+    public String PermissionTest() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("msg", "good");
+        return jsonObject.toJSONString();
     }
 }

@@ -1,8 +1,6 @@
 package com.example.springbootdemo.service;
 
 import com.example.springbootdemo.pojo.User;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.logging.Logger;
 
-@Service
+@Service("userService")
 @CacheConfig(cacheNames = "UserCache")
 public class UserServiceImpl implements UserService {
 

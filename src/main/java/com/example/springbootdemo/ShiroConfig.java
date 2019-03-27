@@ -61,6 +61,7 @@ public class ShiroConfig {
         //logout，退出登录
         filterChainDefinitionMap.put("/", "anon");
         filterChainDefinitionMap.put("/editUser/*", "authc");
+        filterChainDefinitionMap.put("/add", "roles[admin]");
         filterChainDefinitionMap.put("/login", "anon");
         filterChainDefinitionMap.put("/logout", "logout");
         filterChainDefinitionMap.put("/**", "authc");

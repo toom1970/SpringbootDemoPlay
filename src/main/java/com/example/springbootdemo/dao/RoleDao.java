@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Mapper
-@Repository
+@Repository("roleDao")
 public interface RoleDao {
     @Select("select name, password, role from role")
     public List<Role> getAllRole();
@@ -21,6 +21,6 @@ public interface RoleDao {
     @Update("update role set password = #{password}, role = #{role} where name = #{name}")
     public int updateRole(Role role);
 
-    @Select("select name, password, role from role where name = #{name}")
+    @Select("select name, password, role, rolesSet, permissionsSet from role where name = #{name}")
     public Role getRole(String name);
 }
