@@ -9,18 +9,18 @@ import java.util.List;
 @Mapper
 @Repository("roleDao")
 public interface RoleDao {
-    @Select("select name, password, role from role")
+    @Select("select name, password, rolesSet from role")
     public List<Role> getAllRole();
 
-    @Insert("insert into role (name, password, role) values (#{name}, #{password}, #{role})")
+    @Insert("insert into role (name, password, rolesSet) values (#{name}, #{password}, #{rolesSet})")
     public int addRole(Role role);
 
     @Delete("delete from role where name = #{name}")
     public int delete(String name);
 
-    @Update("update role set password = #{password}, role = #{role} where name = #{name}")
+    @Update("update role set password = #{password}, role = #{rolesSet}, permissionsSet = #{permissionsSet} where name = #{name}")
     public int updateRole(Role role);
 
-    @Select("select name, password, role, rolesSet, permissionsSet from role where name = #{name}")
+    @Select("select name, password, rolesSet, permissionsSet from role where name = #{name}")
     public Role getRole(String name);
 }

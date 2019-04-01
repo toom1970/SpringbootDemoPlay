@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>editUser</title>
+</head>
+<body>
+<div style="margin:0px auto; width:500px">
+    <form action="../updateUser" method="post">
+        name: <input name="name" th:value="${user.name}"> <br>
+        sex: <input name="sex" th:value="${user.sex}"><br>
+        <input name="id" type="hidden" th:value="${user.id}">
+        <button type="submit">提交</button>
+    </form>
+</div>
+</body>
+</html>
