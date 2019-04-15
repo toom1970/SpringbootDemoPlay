@@ -2,13 +2,21 @@ package com.example.springbootdemo;
 
 import com.example.springbootdemo.shiroRealm.ShiroRealm;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.session.SessionListener;
+import org.apache.shiro.session.mgt.SessionManager;
+import org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator;
+import org.apache.shiro.session.mgt.eis.SessionIdGenerator;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.servlet.SimpleCookie;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -29,11 +37,50 @@ public class ShiroConfig {
         return shiroRealm;
     }
 
+    //    @Bean
+//    public EhCacheManager ehCacheManager(){
+//        EhCacheManager ehCacheManager = new EhCacheManager();
+//        ehCacheManager.setCacheManager();
+//        return ehCacheManager;
+//    }
+    @Bean
+    public SessionListener sessionListener() {
+        return new ShiroSessionListener();
+    }
+
+    @Bean
+    public SessionIdGenerator sessionIdGenerator() {
+        return new JavaUuidSessionIdGenerator();
+    }
+
+    @Bean
+    public SimpleCookie simpleCookie() {
+        SimpleCookie simpleCookie = new SimpleCookie("sessionId");
+        simpleCookie.setPath("/");
+        simpleCookie.setMaxAge(-1);
+        return simpleCookie;
+    }
+
+    @Bean
+    public SessionManager sessionManager() {
+        DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
+        Collection<SessionListener> listeners = new ArrayList<>();
+        listeners.add(sessionListener());
+        sessionManager.setSessionListeners(listeners);
+        sessionManager.setSessionIdCookie(simpleCookie());
+
+        sessionManager.setGlobalSessionTimeout(5000);
+        sessionManager.setDeleteInvalidSessions(true);
+
+        return sessionManager;
+    }
+
     //安全管理器，将realm加入securityManager
     @Bean
     public SecurityManager securityManager() {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(shiroRealm());
+        securityManager.setSessionManager(sessionManager());
         return securityManager;
     }
 

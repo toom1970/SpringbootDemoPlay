@@ -54,7 +54,7 @@ public class RedisConfig extends CachingConfigurerSupport {
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
         RedisCacheManager cacheManager = new RedisCacheManager(RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory),
-                getRedisCacheConfigurationWithTtl(60), getRedisCacheConfigurationMap());
+                getRedisCacheConfigurationWithTtl(600), getRedisCacheConfigurationMap());
         //设置缓存保留时间（seconds）
         //未指定value的默认为60s,要指定只要在map中添加即可
         return cacheManager;

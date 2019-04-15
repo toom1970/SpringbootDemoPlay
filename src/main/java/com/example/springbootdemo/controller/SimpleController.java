@@ -1,6 +1,7 @@
 package com.example.springbootdemo.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.example.springbootdemo.ShiroSessionListener;
 import com.example.springbootdemo.pojo.User;
 import com.example.springbootdemo.service.UserService;
 import com.github.pagehelper.PageHelper;
@@ -8,6 +9,9 @@ import com.github.pagehelper.PageInfo;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.session.SessionListener;
+import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,14 +34,16 @@ public class SimpleController {
     @RequestMapping("/")
     @ResponseBody
     public PageInfo hello(HttpSession session, Model model, @RequestParam(value = "start", defaultValue = "0") int start, @RequestParam(value = "size", defaultValue = "10") int size) throws Exception {
-        model.addAttribute("appName", "hello123");
+//        model.addAttribute("appName", "hello123");
+
+        Subject subject = SecurityUtils.getSubject();
 
         PageHelper.startPage(start, size);
         List<User> userList = userService.listAll();
         PageInfo<User> page = new PageInfo<>(userList);
         if (page.getPageNum() <= 0)
             page.setNextPage(2);
-        model.addAttribute("page", page);
+//        model.addAttribute("page", page);
         session.setAttribute("lastPage", page.getNavigateLastPage());
 //        JSONObject jsonObject = new JSONObject();
 //        jsonObject = JSONObject.toJSON(page);
@@ -112,6 +118,11 @@ public class SimpleController {
                 return json.toJSONString();
             }
         }
+        Session session = subject.getSession(true);
+        json.put("sessionId", session.getId());
+        json.put("sessionTime", session.getTimeout());
+
+//        json.put("count",sessionListener.getSessionCount());
         return json.toJSONString();
     }
 
@@ -131,8 +142,11 @@ public class SimpleController {
     @ResponseBody
     @RequestMapping("/add")
     public String PermissionTest() {
+        Subject subject = SecurityUtils.getSubject();
+        Session session = subject.getSession();
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("msg", "good");
+        jsonObject.put("CurrectSessionId", session.getId());
         return jsonObject.toJSONString();
     }
 }

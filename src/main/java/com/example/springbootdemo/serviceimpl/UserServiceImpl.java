@@ -20,7 +20,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Cacheable(key = "'listAll'")
     public List<User> listAll() {
-        System.out.println("In");
         return userDao.listAll();
     }
 
